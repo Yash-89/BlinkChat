@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 from django.http import HttpResponse, JsonResponse
+from django.contrib import messages
 
 def home(request):
     return render(request, 'home.html')
@@ -15,8 +16,18 @@ def room(request, room):
     })
 
 def checkview(request):
-    username= request.POST['username']
+    username = request.POST['username']
     room = request.POST['room_name']
+    flag = 1
+
+    for char in username:
+        if char != ' ':
+            flag = 0
+            break
+    
+    if flag == 1:
+        messages.info(request, "Invalid Username")
+        return redirect('/')
 
     if Room.objects.filter(name=room).exists() == False:
         new_room = Room.objects.create(name=room)
