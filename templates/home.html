@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <meta charset="urf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
@@ -55,6 +55,7 @@
       color: #999;
     }
   </style>
+  <title>BlinkChat</title>
 </head>
 
 <body>
@@ -102,9 +103,9 @@
     <form id="post-form" method="POST" action="checkview">
       {% csrf_token %}
       <label>Room Name</label>
-      <input type="text" name="room_name" id="room_name" width="100px" />
+      <input type="text" name="room_name" id="room_name" width="100px" required/>
       <label>Username</label>
-      <input type="text" name="username" id="username" width="100px" />
+      <input type="text" name="username" id="username" width="100px" required/>
       <input type="submit" value="Enter Room">
     </form>
   </div>
