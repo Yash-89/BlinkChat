@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-=atc8fyg_*69o*&a*be%vb*zygaccu7o#r5feodwe0e3_$-(-n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['blinkchat.pythonanywhere.com']
+ALLOWED_HOSTS = ['yash89.pythonanywhere.com']
 
 
 # Application definition
