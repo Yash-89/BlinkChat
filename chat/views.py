@@ -15,7 +15,7 @@ def room(request, room):
         'room_details': room_details,
     })
 
-def checkview(request):
+def login(request):
     username = request.POST['username']
     room = request.POST['room_name']
     flag = 1
@@ -54,4 +54,4 @@ def getMessages(request, room):
     return JsonResponse({'messages': list(messages.values())})
 
 def register(request):
-    pass
+    return render(request, 'register.html')
