@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 CustomUser = get_user_model()
 
@@ -66,6 +67,13 @@ def signup(request):
         dob = request.POST['dob']
         pswrd = request.POST['password']
         pswrd2 = request.POST['c_password']
+
+        dob_date = datetime.strptime(dob, '%Y-%m-%d').date()
+        currDate = datetime.now().date()
+
+        if dob_date > currDate:
+            messages.info(request, 'Date of birth cannot exceed the current day.')
+            return redirect(register)
 
         if pswrd == pswrd2:
             if CustomUser.objects.filter(username=usrnm).exists():
