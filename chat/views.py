@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect
 from .models import *
 from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+
+CustomUser = get_user_model()
 
 def home(request):
     return render(request, 'home.html')
@@ -42,7 +46,7 @@ def send(request):
     username = request.POST['username']
     room_id = request.POST['room_id']
 
-    new_msg = Message.objects.create(value=message, user=username, room=room_id)
+    new_msg = Message.objects.create(msg=message, user=username, room=room_id)
     new_msg.save()
 
     return HttpResponse('Message sent successfully')
@@ -57,4 +61,31 @@ def register(request):
     return render(request, 'register.html')
 
 def signup(request):
-    pass
+    if request.method == 'POST':
+        usrnm = request.POST['username']
+        dob = request.POST['dob']
+        pswrd = request.POST['password']
+        pswrd2 = request.POST['c_password']
+
+        if pswrd == pswrd2:
+            if CustomUser.objects.filter(username=usrnm).exists():
+                messages.info(request, 'Username already used!')
+                return redirect('register')
+            else:
+                user = CustomUser.objects.create_user(
+                    username=usrnm,
+                    dob=dob,
+                    password=pswrd
+                )
+                user.save()
+                return redirect('/')
+        else:
+            messages.info(request, 'The passwords are not matching')
+            return redirect('register')
+    else:
+        return render(request, 'register.html')
+    
+
+def profile(request, usrnm):
+    user = CustomUser.objects.get(username=usrnm)
+    return render(request, 'profile.html', {'user': user})

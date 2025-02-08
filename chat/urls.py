@@ -9,4 +9,5 @@ urlpatterns = [
     path('getMessages/<str:room>/', views.getMessages, name='getMessages'),
     path('register', views.register, name='register'),
     path('signup', views.signup, name='signup'),
+    path('profile/<str:usrnm>/', views.profile, name='profile'),
 ]
