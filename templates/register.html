@@ -17,11 +17,13 @@
         <h3 align="center">Register</h3>
         <form id="post-form" method="POST" action="signup">
           {% csrf_token %}
-          <label>Room Name</label>
-          <input type="text" name="room_name" id="room_name" width="100px" required/>
-          <label>Username</label>
-          <input type="text" name="username" id="username" width="100px" required/>
-          <input type="submit" value="Enter Room">
+          <label for="usrnm">Username</label>
+          <input type="text" name="username" id="usrnm" width="100px" required>
+          <label for="pswrd">Password</label>
+          <input type="password" name="password" id="pswrd" width="100px" required>
+          <label for="c_pswrd">Confirm Password</label>
+          <input type="password" name="c_password" id="c_pswrd" width="100px" required>
+          <input type="submit" value="Sign Up">
         </form>
       </div>
     
