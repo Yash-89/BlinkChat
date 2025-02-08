@@ -55,3 +55,6 @@ def getMessages(request, room):
 
 def register(request):
     return render(request, 'register.html')
+
+def signup(request):
+    pass
