@@ -31,11 +31,9 @@
 
   <div class="bottom">
     <p>Don't have an account? <a href="register">Register</a></p>
-    <p class="info">
-      {% for msg in messages %}
-      {{msg}}
-      {% endfor %}
-    </p>
+    {% for msg in messages %}
+    <p class="info">{{msg}}</p>
+    {% endfor %}
   </div>
 
 </body>
