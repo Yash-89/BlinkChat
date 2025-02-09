@@ -13,6 +13,7 @@
 </head>
 
 <body>
+  <a href="{% url 'logout' %}" id="logout">LogOut</a>
 
   <h2>BlinkChat - {{room}}</h2>
 
@@ -28,19 +29,34 @@
 
   <script type='text/javascript'>
     $(document).ready(function () {
+      function scrollToBottom() {
+        var display = document.getElementById('display');
+        display.scrollTop = display.scrollHeight;
+      }
+
+      function shouldScrollToBottom() {
+        var display = document.getElementById('display');
+        // Check if user is close to the bottom (within 20px)
+        return display.scrollHeight - display.scrollTop <= display.clientHeight + 20;
+      }
+
+      scrollToBottom();
 
       setInterval(function () {
         $.ajax({
           type: 'GET',
           url: "/getMessages/{{room}}/",
           success: function (response) {
+            var wasAtBottom = shouldScrollToBottom();
             // console.log(response);
             $("#display").empty();
-            for (var key in response.messages) {
-              var str = response.messages[key].date.replace("T", " ").slice(0, 19);
-              var temp = "<div class='container darker'><b>" + response.messages[key].user + "</b><p>" + response.messages[key].msg + "</p><span class='time-left'>" + str + "</span></div>";
+            response.messages.forEach(function (message) {
+              var str = message.date.replace("T", " ").slice(0, 19);
+              var temp = "<div class='container darker'><b>" + message.user + "</b><p>" + message.msg + "</p><span class='time-left'>" + str + "</span></div>";
               $("#display").append(temp);
-            }
+            })
+            if (wasAtBottom)
+              scrollToBottom();
           },
           error: function (response) {
             alert('An error occured')
@@ -52,45 +68,11 @@
 
 
   <div class="container">
-    <style>
-      input[type=text],
-      select {
-        width: 100%;
-        padding: 12px 20px;
-        margin: 8px 0;
-        display: inline-block;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-      }
-
-      input[type=submit] {
-        width: 100%;
-        background-color: #4CAF50;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      input[type=submit]:hover {
-        background-color: #45a049;
-      }
-
-      div {
-        border-radius: 5px;
-        background-color: #f2f2f2;
-        padding: 20px;
-      }
-    </style>
-
     <form id="post-form" action="send">
       {% csrf_token %}
       <input type="hidden" name="username" id="username" value="{{username}}" />
       <input type="hidden" name="room_id" id="room_id" value="{{room_details.id}}" />
-      <input type="text" name="message" id="message" width="100px" />
+      <input type="text" name="message" id="message" width="100px" placeholder="Enter Message">
       <input type="submit" value="Send">
     </form>
   </div>
@@ -116,7 +98,7 @@
       }
     });
     document.getElementById('message').value = '';
-  })
+  });
 </script>
 
 </html>
