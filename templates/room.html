@@ -7,6 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{% static 'styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"
     integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
   <title>BlinkChat | {{room}}</title>
@@ -24,8 +25,9 @@
       <p>Hello Everyone, How Are You Guys Doing?</p>
       <span class="time-left">20th, April 2021</span> -->
     </div>
-
   </div>
+
+  <button type="button" id="scroll-to-bottom-btn"><i class="fas fa-arrow-down"></i></button>
 
   <script type='text/javascript'>
     $(document).ready(function () {
@@ -33,6 +35,23 @@
         var display = document.getElementById('display');
         display.scrollTop = display.scrollHeight;
       }
+
+      function handleScroll() {
+        var display = document.getElementById('display');
+        var btn = document.getElementById('scroll-to-bottom-btn');
+        if (display.scrollTop < display.scrollHeight - display.clientHeight - 20) {
+          // alert('Scrolled Up!'); // For debugging
+          btn.style.display = 'block';
+        } else {
+          btn.style.display = 'none';
+        }
+      }
+
+      // Scroll to bottom on button click
+      document.getElementById('scroll-to-bottom-btn').addEventListener('click', scrollToBottom);
+
+      // Attach scroll event handler to display container
+      document.getElementById('display').addEventListener('scroll', handleScroll);
 
       function shouldScrollToBottom() {
         var display = document.getElementById('display');
@@ -62,7 +81,7 @@
             alert('An error occured')
           }
         });
-      }, 1000);
+      }, 10);
     })
   </script>
 
