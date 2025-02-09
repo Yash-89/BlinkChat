@@ -1,18 +1,28 @@
 from django.shortcuts import render, redirect
 from .models import *
-from django.http import HttpResponse, JsonResponse
-from django.contrib import messages
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 from datetime import datetime
+from django.contrib import messages
+from django.contrib import auth
+from django.contrib.auth import get_user_model
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
 
 CustomUser = get_user_model()
 
 def home(request):
     return render(request, 'home.html')
 
+@login_required
 def room(request, room):
     username = request.GET.get('username')
+    if username != request.user.username:
+        messages.info(request, 'Something went wrong!')
+        return redirect('/')
+    
+    if not Room.objects.filter(name=room).exists():
+        messages.info(request, "The Room '" + room + "' does not exist!")
+        return redirect('/')
+
     room_details = Room.objects.get(name=room)
     return render(request, 'room.html', {
         'room': room,
@@ -21,33 +31,54 @@ def room(request, room):
     })
 
 def login(request):
-    username = request.POST['username']
-    room = request.POST['room_name']
-    flag = 1
+    if request.user.is_authenticated:
+        room = request.POST.get('room_name')
 
-    for char in username:
-        if char != ' ':
-            flag = 0
-            break
+        if not Room.objects.filter(name=room).exists():
+            new_room = Room.objects.create(name=room)
+            new_room.save()
+
+        return redirect('/' + room + '/?username=' + request.user.username)
+    elif request.method == 'POST':
+        usrnm = request.POST['username']
+        pswrd = request.POST['password']
+
+        user = auth.authenticate(username=usrnm, password=pswrd)
+
+        if user is not None:
+            auth.login(request, user)
+            return redirect('/')
+        else:
+            messages.info(request, 'Invalid Credentials!')
+            return redirect('/')
+    else:
+        return render(request, 'home.html')
+
+    # username = request.POST['username']
+    # room = request.POST['room_name']
+
+    # if Room.objects.filter(name=room).exists() == False:
+    #     new_room = Room.objects.create(name=room)
+    #     new_room.save()
+
+    #     return redirect('/' + room + '/?username=' + username)
     
-    if flag == 1:
-        messages.info(request, "Invalid Username")
-        return redirect('/')
+    # return redirect('/' + room + '/?username=' + username)
 
-    if Room.objects.filter(name=room).exists() == False:
-        new_room = Room.objects.create(name=room)
-        new_room.save()
-
-        return redirect('/' + room + '/?username=' + username)
-    
-    return redirect('/' + room + '/?username=' + username)
+def logout(request):
+    auth.logout(request)
+    return redirect('/')
 
 def send(request):
     message = request.POST['message']
-    username = request.POST['username']
+    username = request.user.username
     room_id = request.POST['room_id']
 
-    new_msg = Message.objects.create(msg=message, user=username, room=room_id)
+    new_msg = Message.objects.create(
+        msg=message,
+        user=username,
+        room=room_id,
+    )
     new_msg.save()
 
     return HttpResponse('Message sent successfully')
@@ -68,12 +99,23 @@ def signup(request):
         pswrd = request.POST['password']
         pswrd2 = request.POST['c_password']
 
+        flag = 1
+
+        for char in usrnm:
+            if char != ' ':
+                flag = 0
+                break
+        
+        if flag == 1:
+            messages.info(request, "Invalid Username")
+            return redirect('register')
+
         dob_date = datetime.strptime(dob, '%Y-%m-%d').date()
         currDate = datetime.now().date()
 
         if dob_date > currDate:
             messages.info(request, 'Date of birth cannot exceed the current day.')
-            return redirect(register)
+            return redirect('register')
 
         if pswrd == pswrd2:
             if CustomUser.objects.filter(username=usrnm).exists():
@@ -93,7 +135,7 @@ def signup(request):
     else:
         return render(request, 'register.html')
     
-
-def profile(request, usrnm):
-    user = CustomUser.objects.get(username=usrnm)
+@login_required
+def profile(request):
+    user = request.user
     return render(request, 'profile.html', {'user': user})

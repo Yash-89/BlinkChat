@@ -14,23 +14,35 @@
 <body>
 
   <div align="center">
+    {% if user.is_authenticated %}
+    <a href="{% url 'logout' %}" id="logout">LogOut</a>
+    {% endif %}
     <h2>BlinkChat</h2>
   </div>
 
   <div class="container">
-    <h3 align="center">Login</h3>
-    <form id="post-form" method="POST" action="login">
+    <form id="post-form" method="POST" action="{% url 'login' %}">
       {% csrf_token %}
-      <label>Room Name</label>
-      <input type="text" name="room_name" id="room_name" width="100px" required/>
-      <label>Username</label>
-      <input type="text" name="username" id="username" width="100px" required/>
+      {% if not user.is_authenticated %}
+      <h3 align="center">Login</h3>
+      <!-- <label>Room Name</label>
+      <input type="text" name="room_name" id="room_name" width="100px" required/> -->
+      <label for="usrnm">Username</label>
+      <input type="text" name="username" id="usrnm" required>
+      <label for="pswrd">Password</label>
+      <input type="password" name="password" id="pswrd" required>
+      <input type="submit" value="Sign In">
+      {% else %}
+      <h3 align="center">Choose Room</h3>
+      <label for="room">Room Name</label>
+      <input type="text" name="room_name" id="room" required>
       <input type="submit" value="Enter Room">
+      {% endif %}
     </form>
   </div>
 
   <div class="bottom">
-    <p>Don't have an account? <a href="register">Register</a></p>
+    <p>Don't have an account? <a href="{% url 'register' %}">Create</a></p>
     {% for msg in messages %}
     <p class="info">{{msg}}</p>
     {% endfor %}
