@@ -2,122 +2,156 @@
 
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'styles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"
+    ></script>
+    <title>BlinkChat | {{room}}</title>
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="{% static 'styles.css' %}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"
-    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-  <title>BlinkChat | {{room}}</title>
-</head>
+  <body>
+    <a href="{% url 'logout' %}" id="logout">LogOut</a>
 
-<body>
-  <a href="{% url 'logout' %}" id="logout">LogOut</a>
+    <h2>BlinkChat - {{room}}</h2>
 
-  <h2>BlinkChat - {{room}}</h2>
-
-  <div id="display">
-
-    <div class="container darker">
-      <!-- <b>Tom</b>
+    <div id="display">
+      <div class="container darker">
+        <!-- <b>Tom</b>
       <p>Hello Everyone, How Are You Guys Doing?</p>
       <span class="time-left">20th, April 2021</span> -->
+      </div>
     </div>
-  </div>
 
-  <button type="button" id="scroll-to-bottom-btn"><i class="fas fa-arrow-down"></i></button>
+    <button type="button" id="scroll-to-bottom-btn">
+      <i class="fas fa-arrow-down"></i>
+    </button>
 
-  <script type='text/javascript'>
-    $(document).ready(function () {
-      function scrollToBottom() {
-        var display = document.getElementById('display');
-        display.scrollTop = display.scrollHeight;
-      }
-
-      function handleScroll() {
-        var display = document.getElementById('display');
-        var btn = document.getElementById('scroll-to-bottom-btn');
-        if (display.scrollTop < display.scrollHeight - display.clientHeight - 20) {
-          // alert('Scrolled Up!'); // For debugging
-          btn.style.display = 'block';
-        } else {
-          btn.style.display = 'none';
+    <script type="text/javascript">
+      $(document).ready(function () {
+        function scrollToBottom() {
+          var display = document.getElementById("display");
+          display.scrollTop = display.scrollHeight;
         }
-      }
 
-      // Scroll to bottom on button click
-      document.getElementById('scroll-to-bottom-btn').addEventListener('click', scrollToBottom);
-
-      // Attach scroll event handler to display container
-      document.getElementById('display').addEventListener('scroll', handleScroll);
-
-      function shouldScrollToBottom() {
-        var display = document.getElementById('display');
-        // Check if user is close to the bottom (within 20px)
-        return display.scrollHeight - display.scrollTop <= display.clientHeight + 20;
-      }
-
-      scrollToBottom();
-
-      setInterval(function () {
-        $.ajax({
-          type: 'GET',
-          url: "/getMessages/{{room}}/",
-          success: function (response) {
-            var wasAtBottom = shouldScrollToBottom();
-            // console.log(response);
-            $("#display").empty();
-            response.messages.forEach(function (message) {
-              var str = message.date.replace("T", " ").slice(0, 19);
-              var temp = "<div class='container darker'><b>" + message.user + "</b><p>" + message.msg + "</p><span class='time-left'>" + str + "</span></div>";
-              $("#display").append(temp);
-            })
-            if (wasAtBottom)
-              scrollToBottom();
-          },
-          error: function (response) {
-            alert('An error occured')
+        function handleScroll() {
+          var display = document.getElementById("display");
+          var btn = document.getElementById("scroll-to-bottom-btn");
+          if (
+            display.scrollTop <
+            display.scrollHeight - display.clientHeight - 20
+          ) {
+            // alert('Scrolled Up!'); // For debugging
+            btn.style.display = "block";
+          } else {
+            btn.style.display = "none";
           }
-        });
-      }, 10);
-    })
-  </script>
+        }
 
+        // Scroll to bottom on button click
+        document
+          .getElementById("scroll-to-bottom-btn")
+          .addEventListener("click", scrollToBottom);
 
-  <div class="container">
-    <form id="post-form" action="send">
-      {% csrf_token %}
-      <input type="hidden" name="username" id="username" value="{{username}}" />
-      <input type="hidden" name="room_id" id="room_id" value="{{room_details.id}}" />
-      <input type="text" name="message" id="message" width="100px" placeholder="Enter Message">
-      <input type="submit" value="Send">
-    </form>
-  </div>
+        // Attach scroll event handler to display container
+        document
+          .getElementById("display")
+          .addEventListener("scroll", handleScroll);
 
+        function shouldScrollToBottom() {
+          var display = document.getElementById("display");
+          // Check if user is close to the bottom (within 20px)
+          return (
+            display.scrollHeight - display.scrollTop <=
+            display.clientHeight + 20
+          );
+        }
 
-</body>
+        scrollToBottom();
 
-<script type="text/javascript">
-  $(document).on('submit', '#post-form', function (e) {
-    e.preventDefault();
+        setInterval(function () {
+          $.ajax({
+            type: "GET",
+            url: "/getMessages/{{room}}/",
+            success: function (response) {
+              var wasAtBottom = shouldScrollToBottom();
+              // console.log(response);
+              $("#display").empty();
+              response.messages.forEach(function (message) {
+                var str = message.date.replace("T", " ").slice(0, 19);
+                var temp =
+                  "<div class='container darker'><b>" +
+                  message.user +
+                  "</b><p>" +
+                  message.msg +
+                  "</p><span class='time-left'>" +
+                  str +
+                  "</span></div>";
+                $("#display").append(temp);
+              });
+              if (wasAtBottom) scrollToBottom();
+            },
+            error: function (response) {
+              alert("An error occured");
+            },
+          });
+        }, 500);
+      });
+    </script>
 
-    $.ajax({
-      type: 'POST',
-      url: '/send',
-      data: {
-        username: $('#username').val(),
-        room_id: $('#room_id').val(),
-        message: $('#message').val(),
-        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-      },
-      success: function (data) {
-        // alert(data);
-      }
+    <div class="container">
+      <form id="post-form" action="send">
+        {% csrf_token %}
+        <input
+          type="hidden"
+          name="username"
+          id="username"
+          value="{{username}}"
+        />
+        <input
+          type="hidden"
+          name="room_id"
+          id="room_id"
+          value="{{room_details.id}}"
+        />
+        <input
+          type="text"
+          name="message"
+          id="message"
+          width="100px"
+          placeholder="Enter Message"
+        />
+        <input type="submit" value="Send" />
+      </form>
+    </div>
+  </body>
+
+  <script type="text/javascript">
+    $(document).on("submit", "#post-form", function (e) {
+      e.preventDefault();
+
+      $.ajax({
+        type: "POST",
+        url: "/send",
+        data: {
+          username: $("#username").val(),
+          room_id: $("#room_id").val(),
+          message: $("#message").val(),
+          csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        },
+        success: function (data) {
+          // alert(data);
+        },
+      });
+      document.getElementById("message").value = "";
     });
-    document.getElementById('message').value = '';
-  });
-</script>
-
+  </script>
 </html>
